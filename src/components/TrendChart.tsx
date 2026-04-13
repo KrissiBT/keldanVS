@@ -3,6 +3,8 @@ import {
 } from 'recharts'
 import type { YearData } from '../types'
 
+const r = (px: number) => `${px / 16}rem`
+
 interface Props {
   data1: YearData[]
   data2: YearData[]
@@ -26,7 +28,7 @@ const CustomTooltip = ({ active, payload, label }: { active?: boolean; payload?:
   return (
     <div style={{
       background: '#0d0e1f', border: '1px solid #2a2a4a', borderRadius: 4,
-      padding: '8px 12px', fontFamily: 'Share Tech Mono', fontSize: 12,
+      padding: '8px 12px', fontFamily: 'Share Tech Mono', fontSize: r(12),
     }}>
       <div style={{ color: '#888', marginBottom: 4 }}>{label}</div>
       {payload.map((p) => (
@@ -65,7 +67,7 @@ export default function TrendChart({ data1, data2, name1, name2, keyId, label, c
   return (
     <div style={{ marginTop: 24 }}>
       <div style={{
-        fontFamily: 'Orbitron', fontSize: 10, color: 'var(--gold)',
+        fontFamily: 'Orbitron', fontSize: r(10), color: 'var(--gold)',
         letterSpacing: 2, marginBottom: 12, textTransform: 'uppercase',
       }}>
         {label} — {currency1 === currency2 ? `M ${currency1}` : `M`}
@@ -75,12 +77,12 @@ export default function TrendChart({ data1, data2, name1, name2, keyId, label, c
           <CartesianGrid strokeDasharray="2 4" stroke="#1a1a33" />
           <XAxis
             dataKey="year"
-            tick={{ fill: '#666', fontFamily: 'Orbitron', fontSize: 9 }}
+            tick={{ fill: '#666', fontFamily: 'Orbitron', fontSize: r(9) }}
             axisLine={{ stroke: '#2a2a4a' }}
             tickLine={false}
           />
           <YAxis
-            tick={{ fill: '#666', fontFamily: 'Share Tech Mono', fontSize: 9 }}
+            tick={{ fill: '#666', fontFamily: 'Share Tech Mono', fontSize: r(9) }}
             axisLine={false}
             tickLine={false}
             tickFormatter={(v) => `${v}M`}
@@ -89,7 +91,7 @@ export default function TrendChart({ data1, data2, name1, name2, keyId, label, c
           <Tooltip content={<CustomTooltip />} />
           <Legend
             formatter={(value) => (
-              <span style={{ fontFamily: 'Orbitron', fontSize: 9, color: value === 'p1' ? 'var(--p1)' : 'var(--p2)' }}>
+              <span style={{ fontFamily: 'Orbitron', fontSize: r(9), color: value === 'p1' ? 'var(--p1)' : 'var(--p2)' }}>
                 {value === 'p1' ? shortName(name1) : shortName(name2)}
               </span>
             )}

@@ -2,6 +2,8 @@ import { useState, useRef, useEffect } from 'react'
 import type { SearchResult } from '../types'
 import { searchCompanies } from '../api'
 
+const r = (px: number) => `${px / 16}rem`
+
 interface Props {
   player: 1 | 2
   onSelect: (result: SearchResult) => void
@@ -59,7 +61,7 @@ export default function CompanySearch({ player, onSelect, disabled }: Props) {
         <span style={{
           fontFamily: 'Orbitron',
           color,
-          fontSize: 11,
+          fontSize: r(11),
           fontWeight: 900,
           letterSpacing: 2,
           textShadow: `0 0 8px ${color}`,
@@ -75,14 +77,14 @@ export default function CompanySearch({ player, onSelect, disabled }: Props) {
             border: 'none',
             outline: 'none',
             color: 'var(--text)',
-            fontSize: 13,
+            fontSize: r(13),
             padding: '10px 0',
             width: '100%',
             letterSpacing: 1,
           }}
         />
         {loading && (
-          <span style={{ color, fontSize: 11, animation: 'blink 1s infinite' }}>●●●</span>
+          <span style={{ color, fontSize: r(11), animation: 'blink 1s infinite' }}>●●●</span>
         )}
       </div>
 
@@ -101,10 +103,10 @@ export default function CompanySearch({ player, onSelect, disabled }: Props) {
           overflowY: 'auto',
           boxShadow: `0 8px 24px rgba(0,0,0,0.8)`,
         }}>
-          {results.map(r => (
+          {results.map(result => (
             <div
-              key={r.ssn}
-              onClick={() => handleSelect(r)}
+              key={result.ssn}
+              onClick={() => handleSelect(result)}
               style={{
                 padding: '8px 14px',
                 cursor: 'pointer',
@@ -117,9 +119,9 @@ export default function CompanySearch({ player, onSelect, disabled }: Props) {
               onMouseEnter={e => (e.currentTarget.style.background = `${color}22`)}
               onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
             >
-              <span style={{ fontSize: 13 }}>{r.name}</span>
-              <span style={{ fontSize: 11, color: 'var(--text-dim)', fontFamily: 'monospace' }}>
-                {r.ssn.slice(0,6)}-{r.ssn.slice(6)}
+              <span style={{ fontSize: r(13) }}>{result.name}</span>
+              <span style={{ fontSize: r(11), color: 'var(--text-dim)', fontFamily: 'monospace' }}>
+                {result.ssn.slice(0,6)}-{result.ssn.slice(6)}
               </span>
             </div>
           ))}

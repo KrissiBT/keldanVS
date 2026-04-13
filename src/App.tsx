@@ -7,6 +7,9 @@ import type { SearchResult, CompanyData, YearData } from './types'
 
 const EMPTY: CompanyData = { ssn: '', name: '', years: [], keys: {}, loading: false, error: null }
 
+// Convert px → rem so sizes scale with the html font-size
+const r = (px: number) => `${px / 16}rem`
+
 // Read initial state from URL params
 function readUrlParams() {
   const p = new URLSearchParams(window.location.search)
@@ -127,7 +130,7 @@ export default function App() {
   const allYears2 = c2.years.map(y => y.year)
 
   return (
-    <div style={{ maxWidth: 1060, margin: '0 auto', padding: '0 16px 80px' }}>
+    <div style={{ maxWidth: 1260, margin: '0 auto', padding: '0 16px 80px' }}>
 
       {/* ── Header ── */}
       <header style={{ textAlign: 'center', padding: '28px 0 20px' }}>
@@ -137,7 +140,7 @@ export default function App() {
           background: 'linear-gradient(90deg, var(--p1), var(--gold), var(--p2))',
           WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text',
         }}>FYRIRTÆKI VS</h1>
-        <p style={{ fontFamily: 'Share Tech Mono', fontSize: 10, color: '#555', letterSpacing: 3, marginTop: 4 }}>
+        <p style={{ fontFamily: 'Share Tech Mono', fontSize: r(10), color: '#555', letterSpacing: 3, marginTop: 4 }}>
           KELDAN.IS · ÍSLENSKUR FJÁRHAGSSAMANBURÐUR · ULTIMATE SHOWDOWN
         </p>
       </header>
@@ -146,7 +149,7 @@ export default function App() {
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 56px 1fr', gap: 12, marginBottom: 20, alignItems: 'center' }}>
         <CompanySearch player={1} onSelect={r => loadCompany(r, setC1, setYear1, null)} />
         <div style={{
-          textAlign: 'center', fontFamily: 'Orbitron', fontSize: 24, fontWeight: 900,
+          textAlign: 'center', fontFamily: 'Orbitron', fontSize: r(24), fontWeight: 900,
           color: 'var(--gold)', textShadow: '0 0 16px var(--gold)', letterSpacing: 3,
         }}>VS</div>
         <CompanySearch player={2} onSelect={r => loadCompany(r, setC2, setYear2, null)} />
@@ -161,19 +164,19 @@ export default function App() {
             padding: '16px 20px', boxShadow: '0 0 16px #00d4ff22',
             animation: c1.ssn ? 'slide-in-left 0.4s ease-out' : 'none',
           }}>
-            <div style={{ fontFamily: 'Orbitron', fontSize: 9, color: 'var(--p1)', letterSpacing: 3, marginBottom: 4 }}>PLAYER 1</div>
-            <div style={{ fontSize: 17, fontWeight: 'bold', lineHeight: 1.3 }}>
+            <div style={{ fontFamily: 'Orbitron', fontSize: r(9), color: 'var(--p1)', letterSpacing: 3, marginBottom: 4 }}>PLAYER 1</div>
+            <div style={{ fontSize: r(17), fontWeight: 'bold', lineHeight: 1.3 }}>
               {c1.name || <span style={{ color: '#444' }}>—</span>}
             </div>
-            {c1.ssn && <div style={{ fontFamily: 'Share Tech Mono', fontSize: 10, color: '#555', marginTop: 2 }}>
+            {c1.ssn && <div style={{ fontFamily: 'Share Tech Mono', fontSize: r(10), color: '#555', marginTop: 2 }}>
               KT {c1.ssn.slice(0,6)}-{c1.ssn.slice(6)}
             </div>}
-            {c1.loading && <div style={{ color: 'var(--p1)', fontSize: 10, marginTop: 6, animation: 'blink 1s infinite' }}>HLEÐUR GÖGN...</div>}
-            {c1.error && <div style={{ color: '#ff6666', fontSize: 10, marginTop: 6 }}>{c1.error}</div>}
+            {c1.loading && <div style={{ color: 'var(--p1)', fontSize: r(10), marginTop: 6, animation: 'blink 1s infinite' }}>HLEÐUR GÖGN...</div>}
+            {c1.error && <div style={{ color: '#ff6666', fontSize: r(10), marginTop: 6 }}>{c1.error}</div>}
             {y1 && (
               <div style={{ marginTop: 8 }}>
                 <YearPicker years={allYears1} selected={year1 ?? y1.year} player={1} onChange={setYear1} />
-                <div style={{ fontFamily: 'Share Tech Mono', fontSize: 9, color: '#555', marginTop: 4 }}>
+                <div style={{ fontFamily: 'Share Tech Mono', fontSize: r(9), color: '#555', marginTop: 4 }}>
                   {y1.currency} · ×{y1.numbersIn.toLocaleString()}
                 </div>
               </div>
@@ -186,18 +189,18 @@ export default function App() {
               <>
                 <div style={{ display: 'flex', alignItems: 'baseline', gap: 4 }}>
                   <span style={{
-                    fontFamily: 'Orbitron', fontWeight: 900, fontSize: 30,
+                    fontFamily: 'Orbitron', fontWeight: 900, fontSize: r(30),
                     color: s1 > s2 ? 'var(--gold)' : 'var(--p1)',
                     textShadow: `0 0 12px ${s1 > s2 ? 'var(--gold)' : 'var(--p1)'}`,
                   }}>{s1}</span>
-                  <span style={{ color: '#333', fontSize: 18 }}>:</span>
+                  <span style={{ color: '#333', fontSize: r(18) }}>:</span>
                   <span style={{
-                    fontFamily: 'Orbitron', fontWeight: 900, fontSize: 30,
+                    fontFamily: 'Orbitron', fontWeight: 900, fontSize: r(30),
                     color: s2 > s1 ? 'var(--gold)' : 'var(--p2)',
                     textShadow: `0 0 12px ${s2 > s1 ? 'var(--gold)' : 'var(--p2)'}`,
                   }}>{s2}</span>
                 </div>
-                <div style={{ fontFamily: 'Orbitron', fontSize: 8, letterSpacing: 1 }}>
+                <div style={{ fontFamily: 'Orbitron', fontSize: r(8), letterSpacing: 1 }}>
                   {s1 > s2 ? <span style={{ color: 'var(--p1)' }}>P1 SIGRAR</span>
                   : s2 > s1 ? <span style={{ color: 'var(--p2)' }}>P2 SIGRAR</span>
                   : <span style={{ color: 'var(--gold)' }}>JAFNTEFLI</span>}
@@ -212,19 +215,19 @@ export default function App() {
             padding: '16px 20px', boxShadow: '0 0 16px #ff446622',
             animation: c2.ssn ? 'slide-in-right 0.4s ease-out' : 'none',
           }}>
-            <div style={{ fontFamily: 'Orbitron', fontSize: 9, color: 'var(--p2)', letterSpacing: 3, marginBottom: 4 }}>PLAYER 2</div>
-            <div style={{ fontSize: 17, fontWeight: 'bold', lineHeight: 1.3 }}>
+            <div style={{ fontFamily: 'Orbitron', fontSize: r(9), color: 'var(--p2)', letterSpacing: 3, marginBottom: 4 }}>PLAYER 2</div>
+            <div style={{ fontSize: r(17), fontWeight: 'bold', lineHeight: 1.3 }}>
               {c2.name || <span style={{ color: '#444' }}>—</span>}
             </div>
-            {c2.ssn && <div style={{ fontFamily: 'Share Tech Mono', fontSize: 10, color: '#555', marginTop: 2 }}>
+            {c2.ssn && <div style={{ fontFamily: 'Share Tech Mono', fontSize: r(10), color: '#555', marginTop: 2 }}>
               KT {c2.ssn.slice(0,6)}-{c2.ssn.slice(6)}
             </div>}
-            {c2.loading && <div style={{ color: 'var(--p2)', fontSize: 10, marginTop: 6, animation: 'blink 1s infinite' }}>HLEÐUR GÖGN...</div>}
-            {c2.error && <div style={{ color: '#ff6666', fontSize: 10, marginTop: 6 }}>{c2.error}</div>}
+            {c2.loading && <div style={{ color: 'var(--p2)', fontSize: r(10), marginTop: 6, animation: 'blink 1s infinite' }}>HLEÐUR GÖGN...</div>}
+            {c2.error && <div style={{ color: '#ff6666', fontSize: r(10), marginTop: 6 }}>{c2.error}</div>}
             {y2 && (
               <div style={{ marginTop: 8 }}>
                 <YearPicker years={allYears2} selected={year2 ?? y2.year} player={2} onChange={setYear2} />
-                <div style={{ fontFamily: 'Share Tech Mono', fontSize: 9, color: '#555', marginTop: 4 }}>
+                <div style={{ fontFamily: 'Share Tech Mono', fontSize: r(9), color: '#555', marginTop: 4 }}>
                   {y2.currency} · ×{y2.numbersIn.toLocaleString()}
                 </div>
               </div>
@@ -248,7 +251,7 @@ export default function App() {
               ['trends',   'ÞRÓUN'],
             ] as [Tab, string][]).map(([t, lbl]) => (
               <button key={t} onClick={() => setTab(t)} style={{
-                padding: '10px 16px', fontFamily: 'Orbitron', fontSize: 8, letterSpacing: 1.5,
+                padding: '10px 16px', fontFamily: 'Orbitron', fontSize: r(8), letterSpacing: 1.5,
                 background: 'transparent', border: 'none', cursor: 'pointer',
                 borderBottom: tab === t ? '2px solid var(--gold)' : '2px solid transparent',
                 color: tab === t ? 'var(--gold)' : '#555',
@@ -263,7 +266,7 @@ export default function App() {
                 marginRight: 12,
                 padding: '5px 14px',
                 fontFamily: 'Orbitron',
-                fontSize: 8,
+                fontSize: r(8),
                 letterSpacing: 2,
                 background: copied ? '#00ff8822' : 'transparent',
                 border: `1px solid ${copied ? 'var(--green)' : '#2a2a4a'}`,
@@ -280,12 +283,12 @@ export default function App() {
 
           {/* Name header */}
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 80px 1fr', gap: 6, padding: '10px 20px 6px' }}>
-            <div style={{ textAlign: 'right', fontFamily: 'Orbitron', fontSize: 10, color: 'var(--p1)', textShadow: '0 0 6px var(--p1)', letterSpacing: 1 }}>
-              {c1.name.toUpperCase().slice(0, 22)} <span style={{ color: '#555', fontSize: 8 }}>({y1.year})</span>
+            <div style={{ textAlign: 'right', fontFamily: 'Orbitron', fontSize: r(10), color: 'var(--p1)', textShadow: '0 0 6px var(--p1)', letterSpacing: 1 }}>
+              {c1.name.toUpperCase().slice(0, 22)} <span style={{ color: '#555', fontSize: r(8) }}>({y1.year})</span>
             </div>
             <div />
-            <div style={{ fontFamily: 'Orbitron', fontSize: 10, color: 'var(--p2)', textShadow: '0 0 6px var(--p2)', letterSpacing: 1 }}>
-              <span style={{ color: '#555', fontSize: 8 }}>({y2.year})</span> {c2.name.toUpperCase().slice(0, 22)}
+            <div style={{ fontFamily: 'Orbitron', fontSize: r(10), color: 'var(--p2)', textShadow: '0 0 6px var(--p2)', letterSpacing: 1 }}>
+              <span style={{ color: '#555', fontSize: r(8) }}>({y2.year})</span> {c2.name.toUpperCase().slice(0, 22)}
             </div>
           </div>
 
@@ -350,7 +353,7 @@ export default function App() {
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 56px 1fr', gap: 12, marginTop: 10 }}>
           {c1.ssn
             ? <a href={`https://keldan.is/Fyrirtaeki/Yfirlit/${c1.ssn}`} target="_blank" rel="noreferrer"
-                style={{ textAlign: 'center', padding: '7px', fontFamily: 'Orbitron', fontSize: 8, letterSpacing: 2,
+                style={{ textAlign: 'center', padding: '7px', fontFamily: 'Orbitron', fontSize: r(8), letterSpacing: 2,
                   color: 'var(--p1)', border: '1px solid #0d3040', borderRadius: 4, textDecoration: 'none', opacity: 0.6 }}>
                 ↗ P1 Á KELDAN.IS
               </a>
@@ -358,7 +361,7 @@ export default function App() {
           <div />
           {c2.ssn
             ? <a href={`https://keldan.is/Fyrirtaeki/Yfirlit/${c2.ssn}`} target="_blank" rel="noreferrer"
-                style={{ textAlign: 'center', padding: '7px', fontFamily: 'Orbitron', fontSize: 8, letterSpacing: 2,
+                style={{ textAlign: 'center', padding: '7px', fontFamily: 'Orbitron', fontSize: r(8), letterSpacing: 2,
                   color: 'var(--p2)', border: '1px solid #400d1a', borderRadius: 4, textDecoration: 'none', opacity: 0.6 }}>
                 ↗ P2 Á KELDAN.IS
               </a>
@@ -369,16 +372,16 @@ export default function App() {
       {/* ── Idle screen ── */}
       {!c1.ssn && !c2.ssn && (
         <div style={{ textAlign: 'center', padding: '60px 0', color: '#444' }}>
-          <div style={{ fontFamily: 'Orbitron', fontSize: 13, letterSpacing: 4, animation: 'blink 2s ease-in-out infinite', marginBottom: 16 }}>
+          <div style={{ fontFamily: 'Orbitron', fontSize: r(13), letterSpacing: 4, animation: 'blink 2s ease-in-out infinite', marginBottom: 16 }}>
             INSERT COIN TO CONTINUE
           </div>
-          <div style={{ fontFamily: 'Share Tech Mono', fontSize: 11, lineHeight: 2, color: '#555' }}>
+          <div style={{ fontFamily: 'Share Tech Mono', fontSize: r(11), lineHeight: 2, color: '#555' }}>
             Leitaðu að tveimur íslenskum fyrirtækjum hér að ofan<br/>
             Kennitala eða nafn · Gögn frá Keldan.is
           </div>
           <div style={{ marginTop: 28, display: 'flex', gap: 10, justifyContent: 'center', flexWrap: 'wrap' }}>
             {['Eimskip', 'Samherji', 'Marel', 'Íslandspóstur', 'Síminn', 'Norvik'].map(n => (
-              <span key={n} style={{ padding: '4px 12px', border: '1px solid #1a1a33', borderRadius: 4, fontSize: 11, fontFamily: 'Share Tech Mono', color: '#444' }}>{n}</span>
+              <span key={n} style={{ padding: '4px 12px', border: '1px solid #1a1a33', borderRadius: 4, fontSize: r(11), fontFamily: 'Share Tech Mono', color: '#444' }}>{n}</span>
             ))}
           </div>
         </div>
@@ -396,7 +399,7 @@ function YearPicker({ years, selected, player, onChange }: {
     <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>
       {years.slice(0, 7).map(y => (
         <button key={y} onClick={() => onChange(y)} style={{
-          padding: '2px 8px', fontFamily: 'Orbitron', fontSize: 9, letterSpacing: 0.5,
+          padding: '2px 8px', fontFamily: 'Orbitron', fontSize: r(9), letterSpacing: 0.5,
           background: selected === y ? `${color}22` : 'transparent',
           border: `1px solid ${selected === y ? color : '#2a2a4a'}`,
           color: selected === y ? color : '#555',

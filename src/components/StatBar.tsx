@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react'
 
+const r = (px: number) => `${px / 16}rem`
+
 interface Props {
   label: string
   labelEn: string
@@ -52,12 +54,12 @@ export default function StatBar({ label, labelEn, value1, value2, currency1, cur
       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 3 }}>
         <span style={{
           fontFamily: 'Share Tech Mono',
-          fontSize: 13,
+          fontSize: r(13),
           color: !hasV1 ? '#555' : value1! < 0 ? '#ff7777' : p1Wins ? 'var(--gold)' : 'var(--p1)',
           textShadow: p1Wins ? '0 0 8px var(--gold)' : hasV1 ? '0 0 6px var(--p1)' : 'none',
         }}>
           {hasV1 ? fmt(value1!, currency1, numbersIn1) : '—'}
-          {p1Wins && <span style={{ marginLeft: 5, fontSize: 10 }}>◀ WIN</span>}
+          {p1Wins && <span style={{ marginLeft: 5, fontSize: r(10) }}>◀ WIN</span>}
         </span>
         <div style={{ width: '100%', height: 6, background: '#0d0e1f', borderRadius: 3, overflow: 'hidden' }}>
           <div style={{
@@ -76,10 +78,10 @@ export default function StatBar({ label, labelEn, value1, value2, currency1, cur
 
       {/* Label */}
       <div style={{ textAlign: 'center' }}>
-        <div style={{ fontFamily: 'Orbitron', fontSize: 8, color: '#666', letterSpacing: 1, textTransform: 'uppercase', lineHeight: 1.3 }}>
+        <div style={{ fontFamily: 'Orbitron', fontSize: r(8), color: '#666', letterSpacing: 1, textTransform: 'uppercase', lineHeight: 1.3 }}>
           {label}
         </div>
-        <div style={{ fontFamily: 'Share Tech Mono', fontSize: 9, color: '#444', letterSpacing: 0 }}>
+        <div style={{ fontFamily: 'Share Tech Mono', fontSize: r(9), color: '#444', letterSpacing: 0 }}>
           {labelEn}
         </div>
       </div>
@@ -88,11 +90,11 @@ export default function StatBar({ label, labelEn, value1, value2, currency1, cur
       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 3 }}>
         <span style={{
           fontFamily: 'Share Tech Mono',
-          fontSize: 13,
+          fontSize: r(13),
           color: !hasV2 ? '#555' : value2! < 0 ? '#ff7777' : p2Wins ? 'var(--gold)' : 'var(--p2)',
           textShadow: p2Wins ? '0 0 8px var(--gold)' : hasV2 ? '0 0 6px var(--p2)' : 'none',
         }}>
-          {p2Wins && <span style={{ marginRight: 5, fontSize: 10 }}>WIN ▶</span>}
+          {p2Wins && <span style={{ marginRight: 5, fontSize: r(10) }}>WIN ▶</span>}
           {hasV2 ? fmt(value2!, currency2, numbersIn2) : '—'}
         </span>
         <div style={{ width: '100%', height: 6, background: '#0d0e1f', borderRadius: 3, overflow: 'hidden' }}>

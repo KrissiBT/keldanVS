@@ -4,6 +4,11 @@
   padding: 0;
 }
 
+html {
+  /* Scales from 16px at ~1080px wide up to 22px at ~1900px wide */
+  font-size: clamp(16px, 1.15vw, 22px);
+}
+
 :root {
   --bg-deep: #05060f;
   --bg-panel: #0d0e1f;
