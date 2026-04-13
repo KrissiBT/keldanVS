@@ -2,7 +2,7 @@ import React, { useState, useCallback, useEffect, useRef } from 'react'
 import CompanySearch from './components/CompanySearch'
 import StatBar from './components/StatBar'
 import TrendChart from './components/TrendChart'
-import { getCompanyData } from './api'
+import { getCompanyData, getCompanyMeta } from './api'
 import type { SearchResult, CompanyData, YearData } from './types'
 
 const EMPTY: CompanyData = { ssn: '', name: '', years: [], keys: {}, loading: false, error: null }
@@ -18,6 +18,7 @@ function readUrlParams() {
     ssn2: p.get('c2') ?? '',
     year1: p.get('y1') ? Number(p.get('y1')) : null,
     year2: p.get('y2') ? Number(p.get('y2')) : null,
+    tab: (p.get('tab') as Tab | null),
   }
 }
 
@@ -69,7 +70,7 @@ export default function App() {
   const [c2, setC2] = useState<CompanyData>({ ...EMPTY })
   const [year1, setYear1] = useState<number | null>(null)
   const [year2, setYear2] = useState<number | null>(null)
-  const [tab, setTab] = useState<Tab>('income')
+  const [tab, setTab] = useState<Tab>(initialParams.current.tab ?? 'income')
   const [vsFlash, setVsFlash] = useState(false)
   const [copied, setCopied] = useState(false)
 
@@ -80,9 +81,10 @@ export default function App() {
     if (c2.ssn) p.set('c2', c2.ssn)
     if (year1) p.set('y1', String(year1))
     if (year2) p.set('y2', String(year2))
+    p.set('tab', tab)
     const qs = p.toString()
     window.history.replaceState(null, '', qs ? `?${qs}` : window.location.pathname)
-  }, [c1.ssn, c2.ssn, year1, year2])
+  }, [c1.ssn, c2.ssn, year1, year2, tab])
 
   const loadCompany = useCallback(async (
     r: SearchResult,
@@ -109,8 +111,13 @@ export default function App() {
   // Auto-load companies from URL on first render
   useEffect(() => {
     const { ssn1, ssn2, year1: y1, year2: y2 } = initialParams.current
-    if (ssn1) loadCompany({ ssn: ssn1, name: ssn1, deregistered: '', deregisteredDate: null }, setC1, setYear1, y1)
-    if (ssn2) loadCompany({ ssn: ssn2, name: ssn2, deregistered: '', deregisteredDate: null }, setC2, setYear2, y2)
+    async function loadFromSsn(ssn: string, set: React.Dispatch<React.SetStateAction<CompanyData>>, setYear: React.Dispatch<React.SetStateAction<number | null>>, preselectedYear: number | null) {
+      const meta = await getCompanyMeta(ssn)
+      const name = meta?.Name ?? ssn
+      loadCompany({ ssn, name, deregistered: '', deregisteredDate: null }, set, setYear, preselectedYear)
+    }
+    if (ssn1) loadFromSsn(ssn1, setC1, setYear1, y1)
+    if (ssn2) loadFromSsn(ssn2, setC2, setYear2, y2)
   }, [loadCompany])
 
   const handleShare = useCallback(() => {
