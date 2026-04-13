@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react'
+import React, { useState, useCallback, useEffect, useRef } from 'react'
 import CompanySearch from './components/CompanySearch'
 import StatBar from './components/StatBar'
 import TrendChart from './components/TrendChart'
@@ -6,6 +6,17 @@ import { getCompanyData } from './api'
 import type { SearchResult, CompanyData, YearData } from './types'
 
 const EMPTY: CompanyData = { ssn: '', name: '', years: [], keys: {}, loading: false, error: null }
+
+// Read initial state from URL params
+function readUrlParams() {
+  const p = new URLSearchParams(window.location.search)
+  return {
+    ssn1: p.get('c1') ?? '',
+    ssn2: p.get('c2') ?? '',
+    year1: p.get('y1') ? Number(p.get('y1')) : null,
+    year2: p.get('y2') ? Number(p.get('y2')) : null,
+  }
+}
 
 const INCOME_KEYS: [number, boolean][] = [
   [110000, false],  // Rekstrartekjur
@@ -50,17 +61,31 @@ function calcScore(y1: YearData | null, y2: YearData | null): [number, number] {
 type Tab = 'income' | 'balance' | 'cashflow' | 'trends'
 
 export default function App() {
+  const initialParams = useRef(readUrlParams())
   const [c1, setC1] = useState<CompanyData>({ ...EMPTY })
   const [c2, setC2] = useState<CompanyData>({ ...EMPTY })
   const [year1, setYear1] = useState<number | null>(null)
   const [year2, setYear2] = useState<number | null>(null)
   const [tab, setTab] = useState<Tab>('income')
   const [vsFlash, setVsFlash] = useState(false)
+  const [copied, setCopied] = useState(false)
+
+  // Keep URL in sync whenever companies or years change
+  useEffect(() => {
+    const p = new URLSearchParams()
+    if (c1.ssn) p.set('c1', c1.ssn)
+    if (c2.ssn) p.set('c2', c2.ssn)
+    if (year1) p.set('y1', String(year1))
+    if (year2) p.set('y2', String(year2))
+    const qs = p.toString()
+    window.history.replaceState(null, '', qs ? `?${qs}` : window.location.pathname)
+  }, [c1.ssn, c2.ssn, year1, year2])
 
   const loadCompany = useCallback(async (
     r: SearchResult,
     set: React.Dispatch<React.SetStateAction<CompanyData>>,
-    setYear: React.Dispatch<React.SetStateAction<number | null>>
+    setYear: React.Dispatch<React.SetStateAction<number | null>>,
+    preselectedYear?: number | null
   ) => {
     set({ ...EMPTY, ssn: r.ssn, name: r.name, loading: true })
     setYear(null)
@@ -69,10 +94,27 @@ export default function App() {
       const data = await getCompanyData(r.ssn)
       if (!data) throw new Error('No data returned')
       set({ ssn: r.ssn, name: r.name, years: data.years, keys: data.keys, loading: false, error: null })
+      if (preselectedYear && data.years.some(y => y.year === preselectedYear)) {
+        setYear(preselectedYear)
+      }
       setTimeout(() => setVsFlash(true), 200)
     } catch (e: unknown) {
       set({ ...EMPTY, ssn: r.ssn, name: r.name, error: String(e) })
     }
+  }, [])
+
+  // Auto-load companies from URL on first render
+  useEffect(() => {
+    const { ssn1, ssn2, year1: y1, year2: y2 } = initialParams.current
+    if (ssn1) loadCompany({ ssn: ssn1, name: ssn1, deregistered: '', deregisteredDate: null }, setC1, setYear1, y1)
+    if (ssn2) loadCompany({ ssn: ssn2, name: ssn2, deregistered: '', deregisteredDate: null }, setC2, setYear2, y2)
+  }, [loadCompany])
+
+  const handleShare = useCallback(() => {
+    navigator.clipboard.writeText(window.location.href).then(() => {
+      setCopied(true)
+      setTimeout(() => setCopied(false), 2000)
+    })
   }, [])
 
   const bothLoaded = c1.years.length > 0 && c2.years.length > 0
@@ -102,12 +144,12 @@ export default function App() {
 
       {/* ── Search row ── */}
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 56px 1fr', gap: 12, marginBottom: 20, alignItems: 'center' }}>
-        <CompanySearch player={1} onSelect={r => loadCompany(r, setC1, setYear1)} />
+        <CompanySearch player={1} onSelect={r => loadCompany(r, setC1, setYear1, null)} />
         <div style={{
           textAlign: 'center', fontFamily: 'Orbitron', fontSize: 24, fontWeight: 900,
           color: 'var(--gold)', textShadow: '0 0 16px var(--gold)', letterSpacing: 3,
         }}>VS</div>
-        <CompanySearch player={2} onSelect={r => loadCompany(r, setC2, setYear2)} />
+        <CompanySearch player={2} onSelect={r => loadCompany(r, setC2, setYear2, null)} />
       </div>
 
       {/* ── Company cards ── */}
@@ -197,8 +239,8 @@ export default function App() {
           background: 'var(--bg-panel)', border: '1px solid #1a1a33', borderRadius: 8,
           animation: 'flash-in 0.4s ease-out',
         }}>
-          {/* Tabs */}
-          <div style={{ display: 'flex', borderBottom: '1px solid #1a1a33' }}>
+          {/* Tabs + Share button */}
+          <div style={{ display: 'flex', borderBottom: '1px solid #1a1a33', alignItems: 'center' }}>
             {([
               ['income',   'REKSTRARREIKNINGUR'],
               ['balance',  'EFNAHAGUR'],
@@ -214,6 +256,26 @@ export default function App() {
                 transition: 'all 0.15s',
               }}>{lbl}</button>
             ))}
+            <div style={{ flex: 1 }} />
+            <button
+              onClick={handleShare}
+              style={{
+                marginRight: 12,
+                padding: '5px 14px',
+                fontFamily: 'Orbitron',
+                fontSize: 8,
+                letterSpacing: 2,
+                background: copied ? '#00ff8822' : 'transparent',
+                border: `1px solid ${copied ? 'var(--green)' : '#2a2a4a'}`,
+                color: copied ? 'var(--green)' : '#666',
+                borderRadius: 4,
+                cursor: 'pointer',
+                transition: 'all 0.2s',
+                textShadow: copied ? '0 0 8px var(--green)' : 'none',
+              }}
+            >
+              {copied ? '✓ COPIED' : '⇪ DEILA'}
+            </button>
           </div>
 
           {/* Name header */}
